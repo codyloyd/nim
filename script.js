@@ -1,7 +1,15 @@
-var gameboard = {
-  "a": 5,
-  "b": 5,
-  "c": 5
+var gameboard;
+function startGame(){
+  gameboard = {
+    "a": 5,
+    "b": 5,
+    "c": 5
+  }
+  $(".instructions").html(
+    "<h2>how to play</h2>" +
+    "<p> Players take turns taking any number of objects from one of the piles. Whoever takes the last of the objects wins!</p>" +
+    "<p>click one of the piles and enter the number of objects you would like to remove.</p>"
+  )
 }
 
 function removeMarkers(args){
@@ -11,9 +19,13 @@ function removeMarkers(args){
   // console.log(gameboard)
 }
 
-function userTurn(pile){
-  var userInput = prompt("how many items would you like to remove from this pile?")
-  removeMarkers({"pile": pile, "amount": userInput[0]})
+function userTurn(pile, message="how many?"){
+  var amount = prompt(message)
+  if (gameboard[pile] >= amount && amount > 0){
+    removeMarkers({"pile": pile, "amount": amount})
+  } else {
+    userTurn(pile,"that wasn't a valid amount: TRY AGAIN")
+  }
 }
 
 function computerTurn(){
@@ -72,22 +84,34 @@ function renderGameboard(){
   //append grid-c
   
 }
+function gameOverAlert(){
+  $(".instructions").html(
+    "<h2>Game Over!</h2>" +
+    "<p>The winner is " + winner() + "</p>" +
+    "<button class='restart'>Play Again?</button>"
+    )
+  $(".restart").click(function(){
+    startGame()
+    renderGameboard()
+  })
+}
 
 var currentPlayer = 0
 
 $(document).ready(function(){
+  startGame()
   renderGameboard()
-  $(".grid").click(function(e){
+  $(".game").click(function(e){
     var pile = $(this).attr("id")[5]
     takeTurn(pile)
     renderGameboard()
     if (isGameOver()) {
-      alert("gameover: the winner is " + winner())
+      gameOverAlert()
     }
     takeTurn(pile)
     renderGameboard()
     if (isGameOver()) {
-      alert("gameover: the winner is " + winner())
+      gameOverAlert()
     }
   })
 })
